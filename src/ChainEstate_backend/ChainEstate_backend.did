@@ -1,3 +1,20 @@
+type Land = record {
+  id: nat64;
+  name: text;
+  location: text;
+  size: text;
+  timestamp: nat64;
+};
+
 service : {
-    "greet": (text) -> (text) query;
-}
+  "greet": (text) -> (text) query;
+  "get_all_lands": () -> (vec record {
+    id: nat64;
+    name: text;
+    location: text;
+    size: text;
+    timestamp: nat64;
+  }) query;
+
+  "register_land": (text, text, text) -> (text);
+};
