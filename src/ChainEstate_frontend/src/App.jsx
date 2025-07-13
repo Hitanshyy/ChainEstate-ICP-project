@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthClient } from '@dfinity/auth-client';
-import { ChainEstate_backend } from 'declarations/ChainEstate_backend';
 import { AnonymousIdentity } from '@dfinity/agent';
+import { ChainEstate_backend } from 'declarations/ChainEstate_backend';
 
 function App() {
   const [authClient, setAuthClient] = useState(null);
@@ -11,84 +11,81 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function initAuth() {
-      const authClient = await AuthClient.create();
-      setAuthClient(authClient);
+  async function initAuth() {
+    const authClient = await AuthClient.create();
+    setAuthClient(authClient);
 
-      if (await authClient.isAuthenticated()) {
-        setIsAuthenticated(true);
-        const identity = authClient.getIdentity();
-        setUserPrincipal(identity.getPrincipal().toText());
-        ChainEstate_backend.agent.replaceIdentity(identity);
-      } else {
-        ChainEstate_backend.agent.replaceIdentity(new AnonymousIdentity());
-      }
+    if (await authClient.isAuthenticated()) {
+      const identity = authClient.getIdentity();
+      setUserPrincipal(identity.getPrincipal().toText());
+      ChainEstate_backend.agent.replaceIdentity(identity);
+      setIsAuthenticated(true);
+    } else {
+      ChainEstate_backend.agent.replaceIdentity(new AnonymousIdentity());
     }
-    initAuth();
-  }, []);
+  }
+
+  initAuth();
+}, []);
+
 
   const login = async () => {
-    if (!authClient) return;
-    await authClient.login({
-      onSuccess: () => {
-        setIsAuthenticated(true);
-        const identity = authClient.getIdentity();
-        setUserPrincipal(identity.getPrincipal().toText());
-        ChainEstate_backend.agent.replaceIdentity(identity);
-      },
-      identityProvider: 'https://identity.ic0.app', // Mainnet Internet Identity
-    });
-  };
+  if (!authClient) return;
+  await authClient.login({
+    identityProvider: "http://localhost:4943?canisterId=" + process.env.CANISTER_ID_INTERNET_IDENTITY,
+    onSuccess: async () => {
+      const identity = authClient.getIdentity();
+      ChainEstate_backend.agent.replaceIdentity(identity);
+      setUserPrincipal(identity.getPrincipal().toText());
+      setIsAuthenticated(true);
+    }
+  });
+};
+
 
   const logout = async () => {
-    if (!authClient) return;
     await authClient.logout();
+    ChainEstate_backend.agent.replaceIdentity(new AnonymousIdentity());
     setIsAuthenticated(false);
     setUserPrincipal('');
-    ChainEstate_backend.agent.replaceIdentity(new AnonymousIdentity());
     setGreeting('');
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
-    const name = event.target.elements.name.value;
+    const name = e.target.elements.name.value;
     try {
-      const greeting = await ChainEstate_backend.greet(name);
-      setGreeting(greeting);
-      event.target.elements.name.value = ''; // clear input
+      const result = await ChainEstate_backend.greet(name);
+      setGreeting(result);
     } catch (err) {
       console.error('Error calling greet:', err);
-      setGreeting('Failed to get greeting. Please try again.');
+      setGreeting('❌ Failed to get greeting.');
     }
     setLoading(false);
+    e.target.reset();
   };
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
       {!isAuthenticated ? (
-        <button onClick={login} style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}>
-          Login with Internet Identity
-        </button>
+        <button onClick={login}>Login with Internet Identity</button>
       ) : (
         <>
           <div>
-            Logged in as: <strong>{userPrincipal}</strong>{' '}
-            <button onClick={logout} style={{ marginLeft: '1rem' }}>
-              Logout
-            </button>
+            Logged in as: <strong>{userPrincipal}</strong>
+            <button onClick={logout} style={{ marginLeft: '1rem' }}>Logout</button>
           </div>
-          <br />
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="name">Enter your name: &nbsp;</label>
-            <input id="name" type="text" required />
+          <form onSubmit={handleSubmit} style={{ marginTop: '1rem' }}>
+            <label>
+              Your name: &nbsp;
+              <input name="name" required />
+            </label>
             <button type="submit" disabled={loading} style={{ marginLeft: '0.5rem' }}>
-              {loading ? 'Loading...' : 'Click Me!'}
+              {loading ? 'Loading...' : 'Greet Me'}
             </button>
           </form>
-          <section id="greeting" style={{ marginTop: '1rem', fontWeight: 'bold' }}>
-            {greeting}
-          </section>
+          {greeting && <p style={{ marginTop: '1rem' }}><strong>{greeting}</strong></p>}
         </>
       )}
     </main>

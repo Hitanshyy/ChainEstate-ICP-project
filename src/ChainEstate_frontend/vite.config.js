@@ -1,4 +1,6 @@
 /// <reference types="vitest" />
+import path from 'path';
+
 import { fileURLToPath, URL } from 'url';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -18,12 +20,12 @@ export default defineConfig({
       prefix: 'DFX_',
     }),
   ],
-  resolve: {
-    alias: {
-      declarations: fileURLToPath(new URL('../declarations', import.meta.url)),
-    },
-    dedupe: ['@dfinity/agent'],
+ resolve: {
+  alias: {
+    declarations: path.resolve(__dirname, 'src/declarations'),
   },
+},
+
   server: {
     port: 3000,
     proxy: {
@@ -41,4 +43,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: 'src/setupTests.js',
   },
+  
+
 });

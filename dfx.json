@@ -1,26 +1,26 @@
 {
   "canisters": {
     "ChainEstate_backend": {
-      "candid": "src/ChainEstate_backend/ChainEstate_backend.did",
+      "type": "rust",
       "package": "ChainEstate_backend",
-      "type": "rust"
+      "candid": "src/ChainEstate_backend/ChainEstate_backend.did"
     },
     "ChainEstate_frontend": {
-      "dependencies": ["ChainEstate_backend"],
-      "source": ["src/ChainEstate_frontend/dist"],
       "type": "assets",
+      "source": ["src/ChainEstate_frontend/dist"],
+      "dependencies": ["ChainEstate_backend"],
       "workspace": "ChainEstate_frontend"
     },
     "internet_identity": {
+      "type": "custom",
       "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
-      "wasm": "canisters/internet_identity/internet_identity_dev.wasm.gz",
-      "type": "custom"
+      "wasm": "canisters/internet_identity/internet_identity_dev.wasm.gz"
     }
   },
   "defaults": {
     "build": {
-      "args": "",
-      "packtool": ""
+      "packtool": "",
+      "args": ""
     }
   },
   "output_env_file": ".env",
