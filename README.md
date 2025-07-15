@@ -5,13 +5,6 @@ A decentralized land registry platform built on the Internet Computer Protocol (
 
 ---
 
-## 📸 Preview
-
-> *[Insert Screenshot Here]*  
-> *(e.g., Homepage showing land registry form and Internet Identity login)*
-
----
-
 ## 🚀 Overview
 
 **ChainEstate** reimagines land registration using Web3 technology. It replaces vulnerable, centralized land databases with immutable, on-chain records stored in smart canisters on the Internet Computer.
